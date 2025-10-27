@@ -1,0 +1,230 @@
+---
+globs: *.vue,*.css
+---
+# Apple-Inspired Design System
+
+## Design System Tokens
+All design tokens are defined in [src/design-system.css](mdc:src/design-system.css).
+
+## Colors
+
+### Backgrounds
+```css
+var(--background-primary)    /* #FFFFFF - Main backgrounds */
+var(--background-secondary)  /* #F5F5F7 - Secondary backgrounds */
+var(--background-tertiary)   /* #FBFBFD - Tertiary backgrounds */
+var(--background-elevated)   /* #FFFFFF - Cards, modals */
+```
+
+### Text Colors
+```css
+var(--text-primary)    /* #1D1D1F - Main text */
+var(--text-secondary)  /* #6E6E73 - Secondary text */
+var(--text-tertiary)   /* #86868B - Tertiary text */
+var(--text-disabled)   /* #D2D2D7 - Disabled text */
+```
+
+### Accent Colors
+```css
+var(--accent-blue)         /* #0071E3 - Primary actions */
+var(--accent-blue-hover)   /* #0077ED - Hover state */
+var(--accent-blue-pressed) /* #006EDB - Pressed state */
+var(--accent-green)        /* #30D158 - Success */
+var(--accent-red)          /* #FF3B30 - Errors */
+var(--accent-orange)       /* #FF9500 - Warnings */
+```
+
+### Borders
+```css
+var(--border-light)   /* #D2D2D7 - Default borders */
+var(--border-medium)  /* #B8B8BD - Emphasized borders */
+var(--border-focus)   /* #0071E3 - Focus states */
+```
+
+## Typography
+
+### Font Sizes
+```css
+var(--text-xs)    /* 12px */
+var(--text-sm)    /* 14px */
+var(--text-base)  /* 17px */
+var(--text-lg)    /* 19px */
+var(--text-xl)    /* 21px */
+var(--text-2xl)   /* 24px */
+var(--text-3xl)   /* 32px */
+var(--text-4xl)   /* 40px */
+var(--text-5xl)   /* 48px */
+var(--text-6xl)   /* 64px */
+var(--text-7xl)   /* 80px */
+```
+
+### Font Weights
+```css
+var(--weight-regular)   /* 400 */
+var(--weight-medium)    /* 500 */
+var(--weight-semibold)  /* 600 */
+var(--weight-bold)      /* 700 */
+```
+
+### Line Heights
+Use corresponding line heights for each font size:
+```css
+var(--leading-xs)    /* 16px - for --text-xs */
+var(--leading-sm)    /* 20px - for --text-sm */
+var(--leading-base)  /* 25px - for --text-base */
+/* ... etc */
+```
+
+## Spacing
+Use 8px-based spacing scale:
+```css
+var(--space-1)   /* 8px */
+var(--space-2)   /* 16px */
+var(--space-3)   /* 24px */
+var(--space-4)   /* 32px */
+var(--space-5)   /* 40px */
+var(--space-6)   /* 48px */
+var(--space-7)   /* 56px */
+var(--space-8)   /* 64px */
+var(--space-10)  /* 80px */
+var(--space-12)  /* 96px */
+var(--space-16)  /* 128px */
+```
+
+## Border Radius
+```css
+var(--radius-sm)    /* 8px */
+var(--radius-md)    /* 12px */
+var(--radius-lg)    /* 18px */
+var(--radius-xl)    /* 24px */
+var(--radius-full)  /* 980px - pill shape */
+```
+
+## Shadows
+```css
+var(--shadow-xs)   /* Subtle */
+var(--shadow-sm)   /* Small */
+var(--shadow-md)   /* Medium - cards */
+var(--shadow-lg)   /* Large */
+var(--shadow-xl)   /* Extra large */
+var(--shadow-2xl)  /* Dramatic - modals */
+```
+
+## Transitions
+
+### Easing Functions
+```css
+var(--ease-in-out)  /* cubic-bezier(0.4, 0, 0.2, 1) */
+var(--ease-out)     /* cubic-bezier(0.0, 0, 0.2, 1) */
+var(--ease-in)      /* cubic-bezier(0.4, 0, 1, 1) */
+var(--ease-apple)   /* cubic-bezier(0.25, 0.1, 0.25, 1) */
+```
+
+### Durations
+```css
+var(--duration-fast)    /* 150ms */
+var(--duration-base)    /* 200ms */
+var(--duration-medium)  /* 300ms */
+var(--duration-slow)    /* 400ms */
+```
+
+### Common Transition Pattern
+```css
+transition: all var(--duration-medium) var(--ease-in-out);
+```
+
+## Component Patterns
+
+### Buttons (from [src/style.css](mdc:src/style.css))
+```html
+<button class="btn btn-primary">Primary Action</button>
+<button class="btn btn-secondary">Secondary Action</button>
+<button class="btn btn-small">Small Button</button>
+```
+
+### Cards
+```css
+.card {
+  background: var(--background-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  transition: all var(--duration-medium) var(--ease-in-out);
+}
+
+.card:hover {
+  border-color: var(--accent-blue);
+  transform: scale(1.015);
+  box-shadow: var(--shadow-md);
+}
+```
+
+### Modals
+```css
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-dark);
+  backdrop-filter: blur(20px);
+}
+
+.modal-content {
+  background: var(--background-elevated);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-2xl);
+}
+```
+
+### Navigation
+```css
+.navbar {
+  height: var(--nav-height);
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--border-light);
+}
+```
+
+## Layout
+
+### Container
+```css
+.container {
+  max-width: var(--max-width-full);
+  margin: 0 auto;
+  padding: var(--space-3);
+}
+```
+
+### Grid (for survey cards, etc.)
+```css
+.survey-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-3);
+}
+```
+
+## Responsive Design
+Mobile breakpoint: 768px
+
+```css
+@media (max-width: 768px) {
+  /* Adjust font sizes */
+  /* Stack layouts */
+  /* Full-width elements */
+}
+```
+
+## Best Practices
+1. **Use tokens exclusively** - Never hardcode colors, spacing, or font sizes
+2. **Consistent spacing** - Use 8px-based scale (--space-*)
+3. **Smooth transitions** - Always include transitions for interactive elements
+4. **Hover states** - Add subtle hover effects for interactive elements
+5. **Scoped styles** - Use `<style scoped>` in components
+6. **Mobile-first** - Design for mobile, enhance for desktop
+7. **Accessibility** - Ensure sufficient color contrast and focus states
+8. **Performance** - Use `transform` and `opacity` for animations (GPU-accelerated)

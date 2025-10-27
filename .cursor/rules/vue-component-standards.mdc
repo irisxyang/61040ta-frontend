@@ -1,0 +1,148 @@
+---
+globs: *.vue
+---
+# Vue Component Standards
+
+## Composition API with `<script setup>`
+Always use Vue 3 Composition API with `<script setup>` syntax:
+
+```vue
+<template>
+  <div class="component">
+    <!-- Template content -->
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+
+const router = useRouter()
+const authStore = useAuthStore()
+
+// Reactive state
+const loading = ref(false)
+const data = ref([])
+
+// Computed properties
+const hasData = computed(() => data.value.length > 0)
+
+// Lifecycle
+onMounted(() => {
+  // Load data
+})
+</script>
+
+<style scoped>
+/* Component-specific styles */
+</style>
+```
+
+## Component Structure Order
+1. **Template** - HTML structure first
+2. **Script** - Logic and state
+3. **Style** - Scoped CSS last
+
+## Imports
+Follow this import order:
+1. Vue core imports (`ref`, `computed`, `onMounted`, etc.)
+2. Vue Router (`useRouter`)
+3. Pinia stores (`useAuthStore`, etc.)
+4. API services (`surveyAPI`, `authAPI`)
+5. Child components
+
+## Reactivity
+- Use `ref()` for primitive values: `const count = ref(0)`
+- Use `computed()` for derived state: `const doubled = computed(() => count.value * 2)`
+- Always access ref values with `.value` in script, but not in template
+- Use `onMounted()` for initialization logic
+
+## Router Navigation
+```javascript
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+// Navigate programmatically
+router.push('/dashboard')
+router.push({ name: 'survey-editor', params: { id: surveyId } })
+```
+
+## Store Usage
+```javascript
+import { useAuthStore } from '../stores/auth'
+const authStore = useAuthStore()
+
+// Access state
+console.log(authStore.userId)
+
+// Call actions
+await authStore.login(username, password)
+await authStore.logout()
+```
+
+## API Calls
+```javascript
+import { surveyAPI } from '../services/api'
+
+// Always handle errors
+try {
+  const response = await surveyAPI.getUserSurveys(userId)
+  // Handle response
+} catch (error) {
+  console.error('Failed to load:', error)
+  // Show error to user
+}
+```
+
+## Styling
+- Use scoped styles: `<style scoped>`
+- Use CSS custom properties from [src/design-system.css](mdc:src/design-system.css)
+- Follow Apple-inspired design patterns
+- Use design system tokens: `var(--space-3)`, `var(--text-lg)`, `var(--accent-blue)`
+
+## Common Patterns
+
+### Loading State
+```javascript
+const loading = ref(false)
+
+async function loadData() {
+  loading.value = true
+  try {
+    // API call
+  } finally {
+    loading.value = false
+  }
+}
+```
+
+### Error Handling
+```javascript
+const error = ref(null)
+
+try {
+  // API call
+} catch (err) {
+  error.value = err.response?.data?.error || err.message || 'Operation failed'
+}
+```
+
+### Modal Management
+```javascript
+const showModal = ref(false)
+
+function openModal() {
+  showModal.value = true
+}
+
+function closeModal() {
+  showModal.value = false
+}
+```
+
+## Naming Conventions
+- Components: PascalCase (e.g., `DashboardView.vue`)
+- Variables/functions: camelCase (e.g., `loadSurveys`)
+- Props: camelCase in script, kebab-case in template
+- Events: kebab-case (e.g., `@submit-form`)

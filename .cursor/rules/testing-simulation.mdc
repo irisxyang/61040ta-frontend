@@ -1,0 +1,244 @@
+---
+description: Testing and simulation workflows for the survey application
+---
+# Testing and Simulation Workflows
+
+## Available Scripts
+
+### API Testing
+```bash
+npm run test-api
+```
+Runs [scripts/test-api.js](mdc:scripts/test-api.js) - Comprehensive test of all API endpoints.
+
+Tests:
+- User registration and login
+- Survey creation
+- Question management (add/remove)
+- Response submission
+- Response retrieval and counts
+- Sentiment analysis
+- Data integrity
+
+### Quick Simulation
+```bash
+npm run simulate
+```
+Runs [scripts/quick-simulate.js](mdc:scripts/quick-simulate.js) - One-command setup and simulation.
+
+Does:
+1. Creates test user
+2. Creates test survey
+3. Adds questions
+4. Simulates multiple respondents
+5. Shows results
+
+### Setup Test Survey
+```bash
+npm run setup-survey
+```
+Runs [scripts/setup-test-survey.js](mdc:scripts/setup-test-survey.js) - Creates a test survey with sample questions.
+
+Creates:
+- Test user account
+- Survey with title
+- Multiple Likert-scale questions
+
+Outputs:
+- Survey ID
+- Question IDs
+- Survey URL for sharing
+
+### Simulate Responses
+```bash
+npm run simulate-responses
+```
+Runs [scripts/simulate-responses.js](mdc:scripts/simulate-responses.js) - Simulates user responses to existing survey.
+
+Features:
+- Creates multiple test users
+- Submits varied responses (1-5 scale)
+- Realistic distribution patterns
+- Configurable number of respondents
+
+## Script Usage Patterns
+
+### Full Test Workflow
+```bash
+# 1. Test API connectivity
+npm run test-api
+
+# 2. Create test survey
+npm run setup-survey
+# Note the survey ID from output
+
+# 3. Simulate responses
+npm run simulate-responses
+# Provide survey ID when prompted
+
+# 4. View results in browser
+# Navigate to: http://localhost:3000/results/{surveyId}
+```
+
+### Quick Demo
+```bash
+# One command for complete demo
+npm run simulate
+```
+
+## Backend Requirements
+All scripts require the backend API to be running on `http://localhost:8000`.
+
+Verify backend is up:
+```bash
+curl http://localhost:8000/api/UserAuth/register -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"username":"test","password":"test"}'
+```
+
+## Response Distribution Patterns
+Scripts use realistic Likert scale distributions:
+
+**Positive Sentiment**
+```javascript
+const distribution = [0.05, 0.10, 0.15, 0.35, 0.35] // Skewed toward Agree/Strongly Agree
+```
+
+**Negative Sentiment**
+```javascript
+const distribution = [0.35, 0.35, 0.15, 0.10, 0.05] // Skewed toward Disagree/Strongly Disagree
+```
+
+**Neutral/Mixed**
+```javascript
+const distribution = [0.15, 0.20, 0.30, 0.20, 0.15] // Normal distribution
+```
+
+**Bimodal**
+```javascript
+const distribution = [0.30, 0.10, 0.20, 0.10, 0.30] // Split opinions
+```
+
+## Common Testing Scenarios
+
+### Test User Creation
+```javascript
+const userResponse = await authAPI.register(`testuser_${Date.now()}`, 'password123')
+const userId = userResponse.user
+```
+
+### Test Survey Creation
+```javascript
+const surveyResponse = await surveyAPI.createSurvey('Test Survey', userId)
+const surveyId = surveyResponse.survey
+```
+
+### Test Question Addition
+```javascript
+const questions = [
+  'I am satisfied with this product',
+  'I would recommend this to others',
+  'The interface is easy to use'
+]
+
+for (const stem of questions) {
+  await surveyAPI.addQuestion(stem, surveyId)
+}
+```
+
+### Test Response Submission
+```javascript
+// Get all questions
+const questionsResponse = await surveyAPI.getSurveyQuestions(surveyId)
+
+// Submit responses for each question
+for (const { question } of questionsResponse) {
+  const choice = Math.floor(Math.random() * 5) + 1 // Random 1-5
+  await surveyAPI.respondToQuestion(question, userId, choice)
+}
+```
+
+### Test Results Retrieval
+```javascript
+// Get response counts for a question
+const countsResponse = await surveyAPI.getQuestionResponseCounts(questionId)
+const counts = countsResponse[0].counts // [n1, n2, n3, n4, n5]
+
+// Get sentiment analysis
+const sentimentResponse = await surveyAPI.analyzeSentiment(questionId)
+const sentiment = sentimentResponse[0].sentiment
+// Returns: "positive" | "negative" | "neutral" | "mixed" | "bimodal"
+```
+
+## Debugging Scripts
+
+### Enable Verbose Output
+Most scripts have console.log statements. Check terminal output for:
+- Request/response data
+- Error messages
+- Generated IDs
+- URLs
+
+### Common Issues
+
+**Backend Not Running**
+```
+Error: connect ECONNREFUSED 127.0.0.1:8000
+```
+Solution: Start the backend server
+
+**Invalid Survey ID**
+```
+{ error: "Survey not found" }
+```
+Solution: Use the survey ID from setup-survey output
+
+**Token Expired**
+```
+{ error: "Invalid token" }
+```
+Solution: Re-authenticate or create new test user
+
+**Choice Out of Range**
+```
+{ error: "Choice must be between 1 and 5" }
+```
+Solution: Validate choice before calling respondToQuestion
+
+## Script Customization
+
+### Modify Number of Respondents
+Edit [scripts/simulate-responses.js](mdc:scripts/simulate-responses.js):
+```javascript
+const NUM_RESPONDENTS = 50 // Change this value
+```
+
+### Modify Question Set
+Edit [scripts/setup-test-survey.js](mdc:scripts/setup-test-survey.js):
+```javascript
+const questions = [
+  'Your custom question 1',
+  'Your custom question 2',
+  // Add more...
+]
+```
+
+### Modify Response Distribution
+Edit [scripts/simulate-responses.js](mdc:scripts/simulate-responses.js):
+```javascript
+function getRandomChoice() {
+  const distribution = [0.1, 0.2, 0.4, 0.2, 0.1] // Customize
+  // ... rest of function
+}
+```
+
+## Integration with Frontend
+
+After running simulation scripts, test the frontend:
+
+1. **View Dashboard**: `http://localhost:3000/dashboard`
+2. **Take Survey**: `http://localhost:3000/take/{surveyId}`
+3. **View Results**: `http://localhost:3000/results/{surveyId}`
+4. **Edit Survey**: `http://localhost:3000/survey/{surveyId}`
+
+Use the survey IDs output by the scripts to navigate directly to surveys.

@@ -1,0 +1,25 @@
+{
+  "name": "likert-survey-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test-api": "node scripts/test-api.js",
+    "simulate": "node scripts/quick-simulate.js",
+    "setup-survey": "node scripts/setup-test-survey.js",
+    "simulate-responses": "node scripts/simulate-responses.js"
+  },
+  "dependencies": {
+    "vue": "^3.4.0",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}
+

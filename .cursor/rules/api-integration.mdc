@@ -1,0 +1,173 @@
+---
+globs: **/api.js,**/scripts/**/*.js
+---
+# API Integration Patterns
+
+## API Client Setup
+See [src/services/api.js](mdc:src/services/api.js) for the complete API client.
+
+All API endpoints:
+- Use POST requests
+- Send JSON request bodies
+- Return JSON responses
+- Have error handling
+
+## API Structure
+```javascript
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: '',  // Empty uses Vite proxy
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+```
+
+## Authentication API
+```javascript
+// Register new user
+await authAPI.register(username, password)
+// Returns: { user: "ID" }
+
+// Login user
+await authAPI.login(username, password)
+// Returns: { token: "string" }
+
+// Logout
+await authAPI.logout(token)
+// Returns: {}
+
+// Get user ID from token
+await authAPI.getUserFromToken(token)
+// Returns: [{ user: "ID" }]
+
+// Get username from token
+await authAPI.getUsernameFromToken(token)
+// Returns: [{ username: "string" }]
+```
+
+## Survey API
+```javascript
+// Create survey
+await surveyAPI.createSurvey(title, owner)
+// Returns: { survey: "ID" }
+
+// Get user's surveys
+await surveyAPI.getUserSurveys(userId)
+// Returns: [{ survey: "ID" }, ...]
+
+// Get survey details
+await surveyAPI.getSurveyTitle(surveyId)
+// Returns: [{ title: "string" }]
+
+await surveyAPI.getSurveyOwner(surveyId)
+// Returns: [{ owner: "ID" }]
+
+// Question management
+await surveyAPI.addQuestion(stem, surveyId)
+// Returns: { question: "ID" }
+
+await surveyAPI.removeQuestion(questionId)
+// Returns: {}
+
+await surveyAPI.getSurveyQuestions(surveyId)
+// Returns: [{ question: "ID" }, ...]
+
+await surveyAPI.getQuestionStem(questionId)
+// Returns: [{ stem: "string" }]
+
+// Response handling
+await surveyAPI.respondToQuestion(questionId, responderId, choice)
+// Returns: {}
+// Note: choice must be 1-5
+
+await surveyAPI.getQuestionResponseCounts(questionId)
+// Returns: [{ counts: [n1, n2, n3, n4, n5] }]
+// Array indices 0-4 represent choices 1-5
+
+await surveyAPI.analyzeSentiment(questionId)
+// Returns: [{ sentiment: "positive|negative|bimodal|mixed|neutral" }]
+```
+
+## Response Handling
+
+### Query Endpoints (start with `_get`)
+Return arrays of objects:
+```javascript
+const response = await surveyAPI.getSurveyTitle(surveyId)
+const title = response[0]?.title || 'Untitled'
+```
+
+### Action Endpoints
+Return objects directly:
+```javascript
+const response = await surveyAPI.createSurvey(title, userId)
+const surveyId = response.survey
+```
+
+### Error Responses
+All endpoints can return:
+```javascript
+{
+  "error": "string"
+}
+```
+
+## Error Handling Pattern
+```javascript
+try {
+  const response = await surveyAPI.createSurvey(title, userId)
+  
+  // Check for error in response
+  if (response.error) {
+    console.error('API error:', response.error)
+    return
+  }
+  
+  // Use response data
+  const surveyId = response.survey
+} catch (error) {
+  // Handle network/axios errors
+  const message = error.response?.data?.error || error.message || 'Operation failed'
+  console.error('Request failed:', message)
+}
+```
+
+## Bulk Data Loading
+When loading multiple related resources:
+```javascript
+// Load surveys with details
+const surveyResponse = await surveyAPI.getUserSurveys(userId)
+const surveyIds = surveyResponse.map(item => item.survey)
+
+const surveyDetails = await Promise.all(
+  surveyIds.map(async (id) => {
+    const titleResponse = await surveyAPI.getSurveyTitle(id)
+    const questionsResponse = await surveyAPI.getSurveyQuestions(id)
+    
+    return {
+      id,
+      title: titleResponse[0]?.title || 'Untitled',
+      questionCount: questionsResponse.length
+    }
+  })
+)
+```
+
+## Likert Scale
+Responses use a 1-5 Likert scale:
+- 1 = Strongly Disagree
+- 2 = Disagree
+- 3 = Neutral
+- 4 = Agree
+- 5 = Strongly Agree
+
+Always validate choice is between 1 and 5 before calling `respondToQuestion`.
+
+## Testing Scripts
+Scripts in [scripts/](mdc:scripts/) directory test API functionality:
+- `test-api.js` - Comprehensive API tests
+- `setup-test-survey.js` - Create test survey
+- `simulate-responses.js` - Simulate user responses
+- `quick-simulate.js` - Quick simulation workflow

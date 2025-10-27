@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+---
+# Likert Survey Frontend - Project Overview
+
+## Tech Stack
+- **Vue 3** with Composition API (`<script setup>`)
+- **Vite** for build tooling
+- **Pinia** for state management
+- **Vue Router** for routing
+- **Axios** for HTTP requests
+
+## Project Structure
+```
+src/
+├── views/              # Page components
+│   ├── LoginView.vue   # Login/Register page
+│   ├── DashboardView.vue # Survey list dashboard
+│   ├── SurveyEditorView.vue # Survey creation/editing
+│   ├── SurveyTakeView.vue # Public survey taking
+│   └── SurveyResultsView.vue # Survey results & analytics
+├── stores/             # Pinia stores
+│   └── auth.js         # Authentication state
+├── services/           # API services
+│   └── api.js          # API client and methods
+├── router/             # Vue Router
+│   └── index.js        # Route definitions
+├── App.vue             # Root component
+├── main.js             # App entry point
+├── style.css           # Global styles
+└── design-system.css   # Design system tokens
+```
+
+## Key Files
+- [api_spec.md](mdc:api_spec.md) - Complete backend API specification
+- [src/services/api.js](mdc:src/services/api.js) - API client with all endpoints
+- [src/stores/auth.js](mdc:src/stores/auth.js) - Authentication store
+- [src/router/index.js](mdc:src/router/index.js) - Routes with auth guards
+- [src/design-system.css](mdc:src/design-system.css) - Apple-inspired design tokens
+
+## Backend API
+- Backend runs on `http://localhost:8000`
+- All endpoints use POST requests
+- API prefix: `/api/LikertSurvey/` or `/api/UserAuth/`
+- See [api_spec.md](mdc:api_spec.md) for complete documentation
+
+## Authentication
+- Token-based authentication stored in localStorage
+- Auth state managed via Pinia store in [src/stores/auth.js](mdc:src/stores/auth.js)
+- Protected routes use `meta: { requiresAuth: true }`
+- Router guards verify token validity before navigation
+
+## Data Model Concepts
+- **Survey**: Has title, owner (user ID), and questions
+- **Question**: Has stem (text) and belongs to a survey
+- **Response**: Links responder (user), question, and choice (1-5 Likert scale)
+- **User**: Username and password for authentication
+- **Session**: Token for authenticated access
+
+## Scripts
+- `npm run dev` - Start development server
+- `npm run test-api` - Test API integration
+- `npm run simulate` - Quick simulation
+- `npm run setup-survey` - Setup test survey
+- `npm run simulate-responses` - Simulate user responses
+
+## Design Philosophy
+- Apple-inspired design system with SF Pro-like fonts
+- Modern gradient UI with smooth animations
+- Mobile-responsive with graceful degradation
+- Emphasis on clarity and minimal interaction friction

@@ -1,0 +1,172 @@
+---
+globs: **/stores/**/*.js
+---
+# Pinia State Management
+
+## Store Setup Pattern
+Use Composition API style with `defineStore`:
+
+```javascript
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useMyStore = defineStore('myStore', () => {
+  // State (refs)
+  const data = ref(null)
+  const loading = ref(false)
+  
+  // Getters (computed)
+  const hasData = computed(() => !!data.value)
+  
+  // Actions (functions)
+  async function loadData() {
+    loading.value = true
+    try {
+      // Load data
+    } finally {
+      loading.value = false
+    }
+  }
+  
+  // Return public API
+  return {
+    data,
+    loading,
+    hasData,
+    loadData
+  }
+})
+```
+
+## Auth Store Pattern
+See [src/stores/auth.js](mdc:src/stores/auth.js) for reference implementation.
+
+### State Persistence
+Store auth data in localStorage:
+```javascript
+// On login
+token.value = response.token
+localStorage.setItem('token', response.token)
+
+// On logout
+token.value = null
+localStorage.removeItem('token')
+
+// On initialization
+const token = ref(localStorage.getItem('token') || null)
+```
+
+### Auth Store Structure
+```javascript
+export const useAuthStore = defineStore('auth', () => {
+  // State
+  const token = ref(localStorage.getItem('token') || null)
+  const userId = ref(localStorage.getItem('userId') || null)
+  const username = ref(localStorage.getItem('username') || null)
+  const error = ref(null)
+  
+  // Computed
+  const isAuthenticated = computed(() => !!token.value)
+  
+  // Actions
+  async function register(username, password) {
+    // Implementation
+  }
+  
+  async function login(username, password) {
+    // Implementation
+  }
+  
+  async function logout() {
+    // Implementation
+  }
+  
+  async function checkAuth() {
+    // Verify token is still valid
+  }
+  
+  return {
+    token,
+    userId,
+    username,
+    error,
+    isAuthenticated,
+    register,
+    login,
+    logout,
+    checkAuth
+  }
+})
+```
+
+## Using Stores in Components
+```javascript
+import { useAuthStore } from '../stores/auth'
+
+// In <script setup>
+const authStore = useAuthStore()
+
+// Access state
+console.log(authStore.userId)
+console.log(authStore.isAuthenticated)
+
+// Call actions
+await authStore.login(username, password)
+
+// Watch for changes
+watch(() => authStore.userId, (newId) => {
+  console.log('User ID changed:', newId)
+})
+```
+
+## Using Stores in Router
+```javascript
+import { useAuthStore } from '../stores/auth'
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+  
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+    return
+  }
+  
+  next()
+})
+```
+
+## Error Handling in Stores
+```javascript
+async function someAction() {
+  try {
+    error.value = null
+    const response = await api.someCall()
+    
+    if (response.error) {
+      error.value = response.error
+      return false
+    }
+    
+    // Success
+    return true
+  } catch (err) {
+    error.value = err.response?.data?.error || err.message || 'Operation failed'
+    return false
+  }
+}
+```
+
+## Store Naming Conventions
+- Store file: lowercase with hyphens (e.g., `auth.js`, `survey-data.js`)
+- Store name (in defineStore): camelCase (e.g., `'auth'`, `'surveyData'`)
+- Composable export: `use` prefix (e.g., `useAuthStore`, `useSurveyStore`)
+
+## Best Practices
+1. **One store per domain** - Separate concerns (auth, surveys, etc.)
+2. **Async actions** - Use async/await for API calls
+3. **Error state** - Always include error handling
+4. **Loading state** - Track loading for UI feedback
+5. **Computed getters** - Derive state rather than duplicate
+6. **Clear cleanup** - Reset state on logout or navigation
+7. **Persist critical state** - Use localStorage for auth tokens
+8. **Return boolean from actions** - Indicate success/failure clearly
